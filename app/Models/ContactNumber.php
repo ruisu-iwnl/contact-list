@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class ContactNumber extends Model
 {
     use HasFactory;
 
-    protected $table = 'useraccounts'; 
-
     protected $fillable = [
-        'username',
-        'password',
+        'contact_id',
+        'number',
     ];
 
-    public function contacts()
+    protected $table = 'contacts_numbers'; 
+
+
+    public function contact()
     {
-        return $this->hasMany(Contact::class);
+        return $this->belongsTo(Contact::class);
     }
 }

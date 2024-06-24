@@ -32,17 +32,19 @@
             </div>
 
             <div class="mb-4">
-                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                <input id="name" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="name" value="{{ old('name') }}" required>
-                @error('name')
+                <label for="number" class="block text-gray-700 text-sm font-bold mb-2">Number</label>
+                <input id="number" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="number" value="{{ old('number') }}" required>
+                @error('number')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
             </div>
 
+
+
             <div class="mb-4">
-                <label for="contactNumber" class="block text-gray-700 text-sm font-bold mb-2">Number</label>
-                <input id="contactNumber" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="contactNumber" value="{{ old('contactNumber') }}" required>
-                @error('contactNumber')
+                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                <input id="name" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="name" value="{{ old('name') }}" required>
+                @error('name')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
             </div>
@@ -56,9 +58,9 @@
             </div>
 
             <div class="mb-4">
-                <label for="contactAddress" class="block text-gray-700 text-sm font-bold mb-2">Address</label>
-                <input id="contactAddress" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="contactAddress" value="{{ old('contactAddress') }}" required>
-                @error('contactAddress')
+                <label for="address" class="block text-gray-700 text-sm font-bold mb-2">Address</label>
+                <input id="address" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="address" value="{{ old('address') }}" required>
+                @error('address')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
             </div>

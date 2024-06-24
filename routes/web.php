@@ -2,14 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ContactController;
+
+use App\Http\Controllers\RegistrationController;
 
 Route::get('/', function () {
     return view('landing');
 });
 
-Route::get('/login', 'App\Http\Controllers\Auth\LoginController@showLoginForm')->name('login');
-Route::post('/login', 'App\Http\Controllers\Auth\LoginController@login');
-Route::post('/logout', 'App\Http\Controllers\Auth\LoginController@logout')->name('logout');
 
-Route::get('/register', 'App\Http\Controllers\Auth\RegisterController@showRegistrationForm')->name('register');
-Route::post('/register', 'App\Http\Controllers\Auth\RegisterController@register');
+// Registration routes
+Route::get('/register', [RegistrationController::class, 'create'])->name('register');
+Route::post('/register', [RegistrationController::class, 'store']);
+
+// Contact routes
+Route::get('contacts/create', [ContactController::class, 'create'])->name('contacts.create');
+Route::post('contacts/store', [ContactController::class, 'store'])->name('contacts.store');
