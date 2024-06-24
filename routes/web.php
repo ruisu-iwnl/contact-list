@@ -14,7 +14,6 @@ Route::get('/', function () {
 // Registration routes
 Route::get('/register', [RegistrationController::class, 'create'])->name('register');
 Route::post('/register', [RegistrationController::class, 'store']);
-
 // Contact routes
 Route::get('contacts/create', [ContactController::class, 'create'])->name('contacts.create');
 Route::post('contacts/store', [ContactController::class, 'store'])->name('contacts.store');
