@@ -32,7 +32,7 @@
                         @endforeach
                     </td>
                     <td class="border px-4 py-2">
-                        <a href="#" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded">View</a>
+                        <a href="#" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded" onclick="toggleModal('view-modal-id-{{ $loop->index }}')">View</a>
                     </td>
                 </tr>
             @endforeach
@@ -57,6 +57,20 @@
         </div>
     </div>
 </div>
+
+@foreach($contacts as $contact)
+    {{-- View Contact Modal --}}
+    <div id="view-modal-id-{{ $loop->index }}" class="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full hidden flex justify-center items-center p-20">
+        <div class="mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">View Contact</h3>
+                <div class="mt-2">
+                    @livewire('view-contact', ['contact' => $contact], key($contact->id))
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
 
 <script>
     function toggleModal(modalID) {

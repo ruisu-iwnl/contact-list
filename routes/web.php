@@ -1,30 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ContactController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Middleware\PreventAccessWhenAuthenticated;
 
-Route::get('/', function () {
+// Landing page
+Route::middleware('guest')->get('/', function () {
     return view('landing');
-});
+})->name('landing');
 
-// Registration routes
+// Registration and Login routes for guests
 Route::middleware([PreventAccessWhenAuthenticated::class])->group(function () {
     Route::get('/register', [RegistrationController::class, 'create'])->name('register');
     Route::post('/register', [RegistrationController::class, 'store']);
 
-    // Login routes
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
 });
 
+// Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Dashboard contacts routes
     Route::prefix('dashboard/contacts')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('contacts.index');
         Route::get('/create', [DashboardController::class, 'createContact'])->name('contacts.create');
@@ -40,6 +42,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/numbers/update/{contactNumber}', [DashboardController::class, 'updateContactNumber'])->name('contact_numbers.update');
         Route::delete('/numbers/destroy/{contactNumber}', [DashboardController::class, 'destroyContactNumber'])->name('contact_numbers.destroy');
     });
+
+    // Logout route
+    Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 });
 
-Route::middleware('auth')->post('/logout', [LogoutController::class, 'logout'])->name('logout');
+// Prevent authenticated users from accessing login and register routes
+Route::middleware('guest')->group(function () {
+    Route::get('/register', function () {
+        return view('auth.register');
+    })->name('register');
+
+    Route::get('/login', function () {
+        return view('auth.login');
+    })->name('login');
+});
