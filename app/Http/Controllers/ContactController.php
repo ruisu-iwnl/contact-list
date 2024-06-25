@@ -15,7 +15,7 @@ class ContactController extends Controller
     public function index()
     {
         $contacts = Contact::all();
-        return view('contacts.index', compact('contacts'));
+        return view('dashboard', compact('contacts'));
     }
 
     /**
@@ -108,7 +108,7 @@ class ContactController extends Controller
     {
         $contact->delete();
 
-        return redirect()->route('contacts.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Contact deleted successfully.');
     }
 }

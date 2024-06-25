@@ -24,7 +24,7 @@ class RegistrationController extends Controller
             'username' => 'required|unique:useraccounts',
             'password' => 'required|confirmed',
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:contacts|max:255', 
+            'email' => 'required|email|unique:contacts|max:255',
             'address' => 'required|max:255',
             'number' => 'required|string|max:15',
         ]);
@@ -59,21 +59,15 @@ class RegistrationController extends Controller
                 throw new \Exception('Failed to create contact number.');
             }
 
-            if (empty($request->email)) {
-                Log::info('User email: ' . $request->email); 
-                throw new \Exception('User email is empty bro. Cannot send registration email.');
-            }
+            SendRegistrationEmail::dispatch($user, $request->email);
 
-            SendRegistrationEmail::dispatch($user, $request->email); 
+            Cache::put("user:{$user->id}", $user, now()->addMinutes(30));
+            Cache::put("contact:{$contact->id}", $contact, now()->addMinutes(30));
+            Cache::put("contact_number:{$contactNumber->id}", $contactNumber, now()->addMinutes(30));
 
-            Cache::put("user_{$user->id}", $user, now()->addMinutes(30));
-            Cache::put("contact_{$contact->id}", $contact, now()->addMinutes(30));
-            Cache::put("contact_number_{$contactNumber->id}", $contactNumber, now()->addMinutes(30));
-
-            Log::info('Received email: ' . $request->email);
             Log::info('Registration successful for user: ' . $user->username . ', email: ' . $request->email . ' and contact: ' . $contact->name);
 
-            return redirect('/register')
+            return redirect('/')
                 ->with('success', 'Registration successful.');
 
         } catch (\Exception $e) {
