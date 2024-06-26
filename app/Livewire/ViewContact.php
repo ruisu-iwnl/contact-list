@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Contact;
 use App\Models\ContactNumber;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ViewContact extends Component
 {
@@ -15,31 +16,41 @@ class ViewContact extends Component
     public $contact;
     public $editingField = null;
     public $editValue;
+    public $editNumberValues = [];
     public $image;
     public $isEditingAvatar = false;
 
     protected $rules = [
         'editValue' => 'required',
-        'image' => 'nullable|image|max:1024', // Adjust max file size as needed
+        'editNumberValues.*.number' => 'required', 
+        'image' => 'nullable|image|max:1024',
     ];
 
     public function mount(Contact $contact)
     {
         $this->contact = $contact->load('numbers');
+        $this->editNumberValues = $contact->numbers->mapWithKeys(function ($number) {
+            return [$number->id => ['number' => $number->number]];
+        })->toArray();
     }
 
     public function render()
     {
         return view('livewire.view-contact', [
             'contact' => $this->contact,
-            'numbers' => $this->contact->numbers, // Pass numbers to the view
+            'numbers' => $this->contact->numbers,
         ]);
     }
 
     public function editField($field)
     {
         $this->editingField = $field;
-        $this->editValue = $this->contact->{$field};
+        if (Str::startsWith($field, 'numbers.')) {
+            $id = substr($field, strpos($field, '.') + 1);
+            $this->editValue = $this->editNumberValues[$id]['number'];
+        } else {
+            $this->editValue = $this->contact->{$field};
+        }
     }
 
     public function startEditingAvatar()
@@ -57,23 +68,26 @@ class ViewContact extends Component
     {
         $this->validate();
 
-        // Handle image upload
         if ($this->image) {
-            // Delete previous avatar if exists
             if ($this->contact->avatar) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', $this->contact->avatar));
             }
 
-            // Store new avatar
             $fileName = time() . '_' . $this->image->getClientOriginalName();
             $path = $this->image->storeAs('avatars', $fileName, 'public');
             $this->contact->avatar = '/storage/' . $path;
         }
 
-        if ($this->editingField) {
+        if ($this->editingField && !Str::startsWith($this->editingField, 'numbers.')) {
             $this->contact->{$this->editingField} = $this->editValue;
         }
-        
+
+        foreach ($this->editNumberValues as $id => $numberData) {
+            // Sanitize number input before updating
+            $sanitizedNumber = htmlspecialchars($numberData['number'], ENT_QUOTES, 'UTF-8');
+            ContactNumber::where('id', $id)->update(['number' => $sanitizedNumber]);
+        }
+
         $this->contact->save();
 
         $this->editingField = null;
@@ -81,10 +95,5 @@ class ViewContact extends Component
         $this->reset(['image']);
 
         // return redirect('/dashboard');
-    }
-
-    public function getNumbersProperty()
-    {
-        return $this->contact->numbers; // Define a getter for numbers
     }
 }

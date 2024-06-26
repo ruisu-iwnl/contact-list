@@ -47,15 +47,25 @@
             </div>
             <!-- NUMBERSS -->
             <div class="mt-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Numbers:</label>
-                <div class="flex items-center">
-                    <ul class="list-disc list-inside">
-                        @foreach($numbers as $number)
-                            <li class="text-gray-900">{{ $number->number }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
+    <label class="block text-gray-700 text-sm font-bold mb-2">Numbers:</label>
+    <ul class="list-disc list-inside">
+        @foreach($numbers as $number)
+            <li class="text-gray-900">
+                @if($editingField === 'numbers.' . $number->id)
+                    <input wire:model.defer="editNumberValues.{{ $number->id }}.number" type="text" class="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                @else
+                    {{ $number->number }}
+                    <button wire:click="editField('numbers.{{ $number->id }}')" type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h11a1 1 0 110 2H4a1 1 0 01-1-1zM3 9a1 1 0 100 2h8a1 1 0 100-2H3zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                @endif
+            </li>
+        @endforeach
+    </ul>
+</div>
+
 
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
