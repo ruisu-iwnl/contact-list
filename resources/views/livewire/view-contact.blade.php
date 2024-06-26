@@ -1,12 +1,10 @@
 <div>
     <form wire:submit.prevent="submit" enctype="multipart/form-data">
         @csrf
-
         <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
             <header class="py-4 text-center">
                 <h1 class="text-3xl font-bold">Contact Details</h1>
             </header>
-
             <div class="flex justify-center mb-6">
                 <div class="relative">
                     @if($contact->avatar)
@@ -20,10 +18,6 @@
                     @endif
                 </div>
             </div>
-
-
-
-
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
                 <p class="text-gray-900">{{ $contact->name }}</p>
@@ -33,7 +27,6 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
                 <p class="text-gray-900">{{ $contact->email ?: 'Not provided' }}</p>
             </div>
-
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Phone Numbers:</label>
                 <ul class="list-disc ml-6">
@@ -42,7 +35,6 @@
                     @endforeach
                 </ul>
             </div>
-
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Address:</label>
                 <p class="text-gray-900">{{ $contact->address ?: 'Not provided' }}</p>
@@ -52,8 +44,8 @@
                 <label class="block text-gray-700 text-sm font-bold mb-2">Notes:</label>
                 <p class="text-gray-900">{{ $contact->notes ?: 'Not provided' }}</p>
             </div>
-
             <div class="flex justify-end mt-6">
+                <button type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" disabled>Save</button>
                 <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2" onclick="toggleModal('view-modal-id-{{ $loop->index }}')">Close</button>
             </div>
         </div>
