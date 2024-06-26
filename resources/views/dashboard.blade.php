@@ -68,6 +68,9 @@
                     @livewire('view-contact', ['contact' => $contact], key($contact->id))
                 </div>
             </div>
+            <div class="flex justify-end mt-4">
+                <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id-{{ $loop->index }}')">Close</button>
+            </div>
         </div>
     </div>
 @endforeach

@@ -86,7 +86,8 @@
                 @if($editingField)
                     <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">Save</button>
                 @endif
-                <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id')">Close</button>
+                <!-- this seems to be not working so i moved it to dashboard -->
+                <!-- <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id')">Close</button> -->
             </div>
         </div>
     </form>
