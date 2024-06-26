@@ -26,12 +26,20 @@ class ViewContact extends Component
         'image' => 'nullable|image|max:1024',
     ];
 
-    public function mount(Contact $contact)
+    protected $listeners = ['toggleModal'];
+
+    public function toggleModal($contactId)
     {
-        $this->contact = $contact->load('numbers');
-        $this->editNumberValues = $contact->numbers->mapWithKeys(function ($number) {
+        $this->contact = Contact::with('numbers')->find($contactId);
+        $this->editNumberValues = $this->contact->numbers->mapWithKeys(function ($number) {
             return [$number->id => ['number' => $number->number]];
         })->toArray();
+        $this->resetErrorBag();
+    }
+
+    public function mount(Contact $contact)
+    {
+        $this->toggleModal($contact->id);
     }
 
     public function render()
@@ -83,7 +91,6 @@ class ViewContact extends Component
         }
 
         foreach ($this->editNumberValues as $id => $numberData) {
-            // Sanitize number input before updating
             $sanitizedNumber = htmlspecialchars($numberData['number'], ENT_QUOTES, 'UTF-8');
             ContactNumber::where('id', $id)->update(['number' => $sanitizedNumber]);
         }
@@ -94,6 +101,6 @@ class ViewContact extends Component
         $this->isEditingAvatar = false;
         $this->reset(['image']);
 
-        // return redirect('/dashboard');
+        $this->toggleModal($this->contact->id);
     }
 }

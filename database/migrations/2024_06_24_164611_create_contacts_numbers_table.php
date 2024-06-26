@@ -16,6 +16,7 @@ class CreateContactsNumbersTable extends Migration
             $table->unsignedBigInteger('contact_id');
             $table->string('number', 15);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('cascade');
         });
