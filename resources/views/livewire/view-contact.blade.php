@@ -7,14 +7,26 @@
             </header>
             <div class="flex justify-center mb-6">
                 <div class="relative">
-                    @if($contact->avatar)
-                        <img src="{{ asset($contact->avatar) }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto">
-                    @else
-                        <div class="w-24 h-24 border-2 border-gray-300 rounded-full flex items-center justify-center mx-auto">
-                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
+                    @if($isEditingAvatar)
+                        <input type="file" wire:model="image" id="avatar" accept="image/*" class="hidden">
+                        <label for="avatar" class="cursor-pointer">
+                            @if($image)
+                                <img src="{{ $image->temporaryUrl() }}" alt="Avatar Preview" class="w-24 h-24 rounded-full mx-auto cursor-pointer">
+                            @elseif($contact->avatar)
+                                <img src="{{ asset($contact->avatar) }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto cursor-pointer">
+                            @else
+                                <div class="w-24 h-24 border-2 border-gray-300 rounded-full flex items-center justify-center mx-auto cursor-pointer">
+                                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                </div>
+                            @endif
+                        </label>
+                        <div class="mt-2 text-center">
+                            <button type="button" wire:click="cancelEditingAvatar" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none">Cancel</button>
                         </div>
+                    @else
+                        <img src="{{ $contact->avatar ? asset($contact->avatar) : '' }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto cursor-pointer" wire:click="startEditingAvatar">
                     @endif
                 </div>
             </div>
@@ -83,11 +95,10 @@
             </div>
 
             <div class="flex justify-end mt-6">
-                @if($editingField)
+                @if($editingField || $isEditingAvatar)
                     <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">Save</button>
                 @endif
-                <!-- this seems to be not working so i moved it to dashboard -->
-                <!-- <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id')">Close</button> -->
+                <!-- You can add a Close button or manage modal toggling as needed -->
             </div>
         </div>
     </form>
