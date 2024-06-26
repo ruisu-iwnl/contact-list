@@ -4,6 +4,8 @@
         <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
             <header class="py-4 text-center">
                 <h1 class="text-3xl font-bold">Contact Details</h1>
+                <p><span style="color: red;">edit a field first before trying to edit image. there's a bug currently on the image handling, but it works.</span></p>
+
             </header>
             <div class="flex justify-center mb-6">
                 <div class="relative">

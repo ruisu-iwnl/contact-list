@@ -8,8 +8,8 @@
     
     {{-- Search Bar --}}
     <div class="flex mb-4 space-x-2">
-        <input type="text" placeholder="Search..." class="flex-grow p-1 h-9 w-32 border rounded-l-md">
-        <button class="p-2 bg-blue-500 text-white p-1 h-9 w-30 rounded">Search</button>
+        <!-- <input type="text" placeholder="Search..." class="flex-grow p-1 h-9 w-32 border rounded-l-md">
+        <button class="p-2 bg-blue-500 text-white p-1 h-9 w-30 rounded">Search</button> -->
         <button class="p-2 bg-green-500 text-white p-1 h-9 w-30 rounded" onclick="toggleModal('modal-id')">Add Contact</button>
     </div>
 
