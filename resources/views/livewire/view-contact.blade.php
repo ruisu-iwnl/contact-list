@@ -45,6 +45,17 @@
                     </button>
                 </div>
             </div>
+            <!-- NUMBERSS -->
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Numbers:</label>
+                <div class="flex items-center">
+                    <ul class="list-disc list-inside">
+                        @foreach($numbers as $number)
+                            <li class="text-gray-900">{{ $number->number }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
 
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email:</label>

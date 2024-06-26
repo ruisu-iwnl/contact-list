@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Contact;
+use App\Models\ContactNumber;
 use Illuminate\Support\Facades\Storage;
 
 class ViewContact extends Component
@@ -31,6 +32,7 @@ class ViewContact extends Component
     {
         return view('livewire.view-contact', [
             'contact' => $this->contact,
+            'numbers' => $this->contact->numbers, // Pass numbers to the view
         ]);
     }
 
@@ -79,5 +81,10 @@ class ViewContact extends Component
         $this->reset(['image']);
 
         // return redirect('/dashboard');
+    }
+
+    public function getNumbersProperty()
+    {
+        return $this->contact->numbers; // Define a getter for numbers
     }
 }
