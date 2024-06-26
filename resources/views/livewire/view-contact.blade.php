@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit.prevent="submit" enctype="multipart/form-data">
+    <form wire:submit.prevent="saveEdit" enctype="multipart/form-data">
         @csrf
         <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
             <header class="py-4 text-center">
@@ -20,33 +20,73 @@
             </div>
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                <p class="text-gray-900">{{ $contact->name }}</p>
+                <div class="flex items-center">
+                    @if($editingField === 'name')
+                        <input wire:model.defer="editValue" type="text" class="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    @else
+                        <p class="text-gray-900">{{ $contact->name }}</p>
+                    @endif
+                    <button wire:click="editField('name')" type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h11a1 1 0 110 2H4a1 1 0 01-1-1zM3 9a1 1 0 100 2h8a1 1 0 100-2H3zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <p class="text-gray-900">{{ $contact->email ?: 'Not provided' }}</p>
+                <div class="flex items-center">
+                    @if($editingField === 'email')
+                        <input wire:model.defer="editValue" type="email" class="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    @else
+                        <p class="text-gray-900">{{ $contact->email ?: 'Not provided' }}</p>
+                    @endif
+                    <button wire:click="editField('email')" type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h11a1 1 0 110 2H4a1 1 0 01-1-1zM3 9a1 1 0 100 2h8a1 1 0 100-2H3zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="mt-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Phone Numbers:</label>
-                <ul class="list-disc ml-6">
-                    @foreach($contact->numbers as $number)
-                        <li>{{ $number->number }}</li>
-                    @endforeach
-                </ul>
-            </div>
+
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Address:</label>
-                <p class="text-gray-900">{{ $contact->address ?: 'Not provided' }}</p>
+                <div class="flex items-center">
+                    @if($editingField === 'address')
+                        <input wire:model.defer="editValue" type="text" class="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    @else
+                        <p class="text-gray-900">{{ $contact->address ?: 'Not provided' }}</p>
+                    @endif
+                    <button wire:click="editField('address')" type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h11a1 1 0 110 2H4a1 1 0 01-1-1zM3 9a1 1 0 100 2h8a1 1 0 100-2H3zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Notes:</label>
-                <p class="text-gray-900">{{ $contact->notes ?: 'Not provided' }}</p>
+                <div class="flex items-center">
+                    @if($editingField === 'notes')
+                        <textarea wire:model.defer="editValue" class="form-textarea mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                    @else
+                        <p class="text-gray-900">{{ $contact->notes ?: 'Not provided' }}</p>
+                    @endif
+                    <button wire:click="editField('notes')" type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h11a1 1 0 110 2H4a1 1 0 01-1-1zM3 9a1 1 0 100 2h8a1 1 0 100-2H3zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
             </div>
+
             <div class="flex justify-end mt-6">
-                <button type="button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2" disabled>Save</button>
-                <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2" onclick="toggleModal('view-modal-id-{{ $loop->index }}')">Close</button>
+                @if($editingField)
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">Save</button>
+                @endif
+                <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id')">Close</button>
             </div>
         </div>
     </form>
