@@ -115,6 +115,9 @@
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Save
                 </button>
+                <button type="button" wire:click="deleteContact" onclick="confirm('Are you sure you want to delete this contact?') || event.stopImmediatePropagation()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Delete Contact
+                </button>
             </div>
         </div>
     </form>

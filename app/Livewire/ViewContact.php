@@ -31,6 +31,11 @@ class ViewContact extends Component
     public function toggleModal($contactId)
     {
         $this->contact = Contact::with('numbers')->find($contactId);
+
+        if (!$this->contact) {
+            abort(404, 'Contact not found');
+        }
+
         $this->editNumberValues = $this->contact->numbers->mapWithKeys(function ($number) {
             return [$number->id => ['number' => $number->number]];
         })->toArray();
@@ -44,6 +49,10 @@ class ViewContact extends Component
 
     public function render()
     {
+        if (!$this->contact) {
+            return ''; // or handle this case as per your application's design
+        }
+
         return view('livewire.view-contact', [
             'contact' => $this->contact,
             'numbers' => $this->contact->numbers,
@@ -103,4 +112,16 @@ class ViewContact extends Component
 
         $this->toggleModal($this->contact->id);
     }
+
+    public function deleteContact()
+    {
+        if ($this->contact) {
+            $this->contact->delete();
+        }
+    
+        $this->reset(['contact', 'editingField', 'editValue', 'editNumberValues', 'image', 'isEditingAvatar']);
+    
+        return redirect()->to('/dashboard'); 
+    }
+    
 }
