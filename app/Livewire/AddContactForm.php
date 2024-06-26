@@ -62,8 +62,9 @@ class AddContactForm extends Component
             $contact->notes = $this->sanitizeField($this->notes);
 
             if ($this->image) {
-                $path = $this->image->store('avatars');
-                $contact->avatar = $path;
+                // Store the avatar image data in Redis
+                $imageData = file_get_contents($this->image->getRealPath());
+                $contact->storeAvatarInRedis($imageData);
             }
 
             $contact->save();
@@ -76,17 +77,6 @@ class AddContactForm extends Component
                     $contactNumber->save();
                 }
             }
-
-            $redisKey = 'contact:' . Str::slug($this->name);
-            $redisValue = json_encode([
-                'name' => $this->name,
-                'email' => $this->email,
-                'numbers' => $this->numbers,
-                'address' => $this->address,
-                'notes' => $this->notes,
-            ]);
-
-            Redis::set($redisKey, $redisValue);
 
             $this->reset(['name', 'email', 'numbers', 'address', 'notes', 'image']);
 

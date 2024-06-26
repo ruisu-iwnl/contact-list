@@ -18,7 +18,7 @@ class CreateContactsTable extends Migration
             $table->string('email', 100)->nullable();
             $table->string('address', 255)->nullable();
             $table->text('notes')->nullable();
-            $table->binary('avatar')->nullable();
+            $table->string('avatar')->nullable();
 
             $table->foreign('user_id')->references('id')->on('useraccounts')->onDelete('cascade');
 
