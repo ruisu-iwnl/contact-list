@@ -9,15 +9,20 @@
 
             <div class="flex justify-center mb-6">
                 <div class="relative">
-                    @if($avatarUrl)
-                        <img src="{{ $avatarUrl }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto">
+                    @if($contact->avatar)
+                        <img src="{{ asset($contact->avatar) }}" alt="Avatar" class="w-24 h-24 rounded-full mx-auto">
                     @else
                         <div class="w-24 h-24 border-2 border-gray-300 rounded-full flex items-center justify-center mx-auto">
-                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
                         </div>
                     @endif
                 </div>
             </div>
+
+
+
 
             <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Name:</label>

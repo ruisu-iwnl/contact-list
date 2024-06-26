@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Str;
 
 class Contact extends Model
 {
@@ -18,7 +16,7 @@ class Contact extends Model
         'email',
         'address',
         'notes',
-        'avatar', // Ensure avatar is fillable
+        'photo', // Ensure this matches your database column name
     ];
 
     protected $casts = [
@@ -26,46 +24,33 @@ class Contact extends Model
     ];
 
     /**
-     * Accessor for avatar attribute to prepend storage path.
+     * Accessor for photo attribute to prepend storage path.
      *
      * @param  mixed  $value
      * @return string|null
      */
-    public function getAvatarAttribute($value)
+    public function getPhotoAttribute($value)
     {
         if ($value) {
-            return Storage::url($value); // Prepend storage path to avatar
+            // Ensure correct path handling
+            if (strpos($value, 'http') === 0 || strpos($value, '/storage/') === 0) {
+                return $value;
+            }
+            return Storage::url($value);
         }
-
         return null;
     }
 
     /**
-     * Mutator for avatar attribute to store only the path.
+     * Mutator for photo attribute to store only the path.
      *
      * @param  mixed  $value
      * @return void
      */
-    public function setAvatarAttribute($value)
+    public function setPhotoAttribute($value)
     {
         // Store only the path in the database
-        $this->attributes['avatar'] = $value;
-    }
-
-    /**
-     * Store avatar image data in Redis.
-     *
-     * @param  mixed  $imageData
-     * @return void
-     */
-    public function storeAvatarInRedis($imageData)
-    {
-        $redisKey = 'avatar:' . Str::uuid(); // Generate a unique key for the avatar
-        Redis::set($redisKey, $imageData); // Store the image data in Redis
-
-        // Update the avatar attribute in the database with the Redis key
-        $this->avatar = $redisKey;
-        $this->save();
+        $this->attributes['photo'] = $value;
     }
 
     public function user()

@@ -6,9 +6,6 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Contact;
 use App\Models\ContactNumber;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 
 class AddContactForm extends Component
@@ -61,10 +58,16 @@ class AddContactForm extends Component
             $contact->address = $this->sanitizeField($this->address);
             $contact->notes = $this->sanitizeField($this->notes);
 
+            // if ($this->image) {
+            //     $fileName = time() . '_' . $this->image->getClientOriginalName(); 
+            //     $path = $this->image->storeAs('avatars', $fileName, 'public'); 
+            //     $contact->avatar = $fileName; //'storage/public/avatars/' . 
+            // }
+
             if ($this->image) {
-                // Store the avatar image data in Redis
-                $imageData = file_get_contents($this->image->getRealPath());
-                $contact->storeAvatarInRedis($imageData);
+                $fileName = time() . '_' . $this->image->getClientOriginalName();
+                $path = $this->image->storeAs('avatars', $fileName, 'public');
+                $contact->avatar = '/storage/' . $path;
             }
 
             $contact->save();
