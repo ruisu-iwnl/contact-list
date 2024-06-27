@@ -1,66 +1,105 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+REDIS:
+# Setting up Redis
+sudo apt install redis-server
+sudo nano /etc/redis/redis.conf (change config)
+# Start Redis
+sudo service redis-server start
+# Check Redis status
+sudo systemctl status redis-server.service
+# Installs Redis in the app
+composer require predis/predis
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+MYSQL:
+# To access MySQL via Docker
+docker-compose exec mysql mysql -u root -p
+docker-compose exec mysql mysql -u admin -p
 
-## About Laravel
+# Access MySQL in Docker container
+docker exec -it 80a0645ca120 mysql -u root -p
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+UBUNTU WSL2:
+# To install PHP in WSL2
+sudo apt update
+sudo apt update && sudo apt upgrade -y
+sudo apt -y install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# If you need curl extension:
+sudo apt install php-curl
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Restart Apache
+sudo service apache2 restart
 
-## Learning Laravel
+# If no zip/unzip extensions are found
+sudo apt update && \
+sudo apt install php-zip unzip php-xml && \
+composer create-project --prefer-dist laravel/laravel contact-list
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+LARAVEL:
+# Install MySQL and extension
+sudo apt install mysql-server
+sudo apt install php-mysql
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Install Sail
+composer require laravel/sail –dev
+php artisan sail:install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Install Livewire
+composer require livewire/livewire
+php artisan livewire:publish --assets
 
-## Laravel Sponsors
+# If migrating doesn’t work, try changing the port in docker-compose.yml
+# Example: ports: - '8080:80'
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Migrate using Sail
+./vendor/bin/sail artisan migrate
 
-### Premium Partners
+# Install Tailwind CSS
+# Install npm
+sudo apt install npm
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# Install nvm
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-## Contributing
+# Require Livewire
+composer require livewire/livewire
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Install Node (example with version 14)
+nvm install 14
+nvm use 14
 
-## Code of Conduct
+# Clear cache
+./vendor/bin/sail artisan cache:clear
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Clear configuration cache
+./vendor/bin/sail artisan config:clear
 
-## Security Vulnerabilities
+# Ensure things are properly loaded after making new migration
+composer dump-autoload
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# To access Laravel logs (using log facade)
+# Enter Sail shell
+sail shell
+cd storage/logs
+tail -n 50 laravel.log
 
-## License
+# Clear config and cache config
+php artisan config:clear
+php artisan config:cache
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# To allow folder connection
+sail (or php) artisan storage:link
+
+# Manually make the storage connection (for Windows users)
+ln -s $(pwd)/storage/app/public $(pwd)/public/storage
+sail (or php) artisan storage:link
+
+# Grant all permissions on Linux
+sudo chmod -R 777 *
+
+# Example SQL queries
+select * from useraccounts; 
+select * from contacts; 
+select * from contacts_numbers; 
+select * from logs;
