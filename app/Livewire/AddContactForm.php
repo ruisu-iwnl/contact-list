@@ -47,7 +47,7 @@ class AddContactForm extends Component
                 'numbers.*' => 'required|string|max:15',
                 'address' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
-                'image' => 'nullable|image|max:1024',
+                'image' => 'nullable|image|max:25000',
             ]);
 
             $user = Auth::user();

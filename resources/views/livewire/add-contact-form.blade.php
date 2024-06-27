@@ -20,7 +20,10 @@
                     @endif
                     <input wire:model="image" type="file" name="image" id="image" class="hidden" accept=".png, .jpeg, .jpg">
                 </label>
+                
             </div>
+            <p class="text-sm text-gray-600">Maximum size is 25MB</p><br>
+
 
             <input wire:model="name" type="text" name="name" placeholder="Name" class="w-full p-2 mb-3 border rounded">
             @error('name')
