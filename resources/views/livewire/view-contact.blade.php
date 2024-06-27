@@ -5,7 +5,6 @@
             <header class="py-4 text-center">
                 <h1 class="text-3xl font-bold">Contact Details</h1>
                 <p><span style="color: red;">hello! please edit a field first before trying to replace the image. there's a bug currently on the image handling, but it works. thanks!!!</span></p>
-
             </header>
             <div class="flex justify-center mb-6">
                 <div class="relative">

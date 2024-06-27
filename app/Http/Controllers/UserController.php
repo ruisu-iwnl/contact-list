@@ -23,13 +23,11 @@ class UserController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        // Create user account
         $user = User::create([
             'username' => $request->username,
             'password' => bcrypt($request->password),
         ]);
 
-        // Create contact associated with the user
         $contact = Contact::create([
             'user_id' => $user->id,
             'name' => $request->name,
