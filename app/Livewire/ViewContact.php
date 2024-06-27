@@ -85,44 +85,56 @@ class ViewContact extends Component
     public function saveEdit()
     {
         $this->validate();
-
+    
         $oldValues = $this->contact->getOriginal();
-
+    
+        // Prepare variables to store updated field labels
+        $updatedFields = [];
+    
         if ($this->image) {
             if ($this->contact->avatar) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', $this->contact->avatar));
             }
-
+    
             $fileName = time() . '_' . $this->image->getClientOriginalName();
             $path = $this->image->storeAs('avatars', $fileName, 'public');
             $this->contact->avatar = '/storage/' . $path;
+            $updatedFields[] = 'Avatar';
         }
-
+    
         if ($this->editingField && !Str::startsWith($this->editingField, 'numbers.')) {
             $this->contact->{$this->editingField} = $this->editValue;
+            $updatedFields[] = $this->getLabelForField($this->editingField);
         }
-
+    
         foreach ($this->editNumberValues as $id => $numberData) {
-            $sanitizedNumber = htmlspecialchars($numberData['number'], ENT_QUOTES, 'UTF-8');
-            ContactNumber::where('id', $id)->update(['number' => $sanitizedNumber]);
+            $currentNumber = htmlspecialchars($numberData['number'], ENT_QUOTES, 'UTF-8');
+            $oldNumber = htmlspecialchars(ContactNumber::find($id)->number, ENT_QUOTES, 'UTF-8');
+    
+            if ($currentNumber !== $oldNumber) {
+                ContactNumber::where('id', $id)->update(['number' => $currentNumber]);
+                $updatedFields[] = 'Number';
+            }
         }
-
+    
         $this->contact->save();
-
-        // Log activity
+    
+        // Log activity with updated field labels
         Log::create([
             'user_id' => auth()->id(),
-            'activity_description' => 'Updated contact: ' . $this->contact->name,
+            'activity_description' => 'Updated contact (' . $this->contact->name . '): ' . implode(', ', $updatedFields),
             'old_values' => json_encode($oldValues),
             'new_values' => json_encode($this->contact->fresh()->toArray()),
         ]);
-
+    
         $this->editingField = null;
         $this->isEditingAvatar = false;
         $this->reset(['image']);
-
+    
         $this->toggleModal($this->contact->id);
     }
+    
+
 
     public function deleteContact()
     {
@@ -141,4 +153,24 @@ class ViewContact extends Component
 
         return redirect()->to('/dashboard');
     }
+
+    // Helper function to get label for a specific field
+    private function getLabelForField($field)
+    {
+        switch ($field) {
+            case 'name':
+                return 'Name';
+            case 'email':
+                return 'Email';
+            case 'address':
+                return 'Address';
+            case 'notes':
+                return 'Notes';
+            // Add more cases as needed for other fields
+            default:
+                return ucfirst($field);
+        }
+    }
+
+
 }
