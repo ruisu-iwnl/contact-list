@@ -6,6 +6,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Contact;
 use App\Models\ContactNumber;
+use App\Models\Log; // Import Log model
 use Livewire\WithFileUploads;
 
 class AddContactForm extends Component
@@ -58,12 +59,6 @@ class AddContactForm extends Component
             $contact->address = $this->sanitizeField($this->address);
             $contact->notes = $this->sanitizeField($this->notes);
 
-            // if ($this->image) {
-            //     $fileName = time() . '_' . $this->image->getClientOriginalName(); 
-            //     $path = $this->image->storeAs('avatars', $fileName, 'public'); 
-            //     $contact->avatar = $fileName; //'storage/public/avatars/' . 
-            // }
-
             if ($this->image) {
                 $fileName = time() . '_' . $this->image->getClientOriginalName();
                 $path = $this->image->storeAs('avatars', $fileName, 'public');
@@ -80,6 +75,14 @@ class AddContactForm extends Component
                     $contactNumber->save();
                 }
             }
+
+            // Log activity
+            Log::create([
+                'user_id' => $user->id,
+                'activity_description' => 'Added contact: ' . $contact->name,
+                'old_values' => null,
+                'new_values' => json_encode($contact->fresh()->toArray()), // Record new contact values
+            ]);
 
             $this->reset(['name', 'email', 'numbers', 'address', 'notes', 'image']);
 

@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Contact;
 use App\Models\ContactNumber;
+use App\Models\Log; // Include Log model
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -22,7 +23,7 @@ class ViewContact extends Component
 
     protected $rules = [
         'editValue' => 'required',
-        'editNumberValues.*.number' => 'required', 
+        'editNumberValues.*.number' => 'required',
         'image' => 'nullable|image|max:1024',
     ];
 
@@ -50,7 +51,7 @@ class ViewContact extends Component
     public function render()
     {
         if (!$this->contact) {
-            return ''; // or handle this case as per your application's design
+            return '';
         }
 
         return view('livewire.view-contact', [
@@ -85,6 +86,8 @@ class ViewContact extends Component
     {
         $this->validate();
 
+        $oldValues = $this->contact->getOriginal();
+
         if ($this->image) {
             if ($this->contact->avatar) {
                 Storage::disk('public')->delete(str_replace('/storage/', '', $this->contact->avatar));
@@ -106,6 +109,14 @@ class ViewContact extends Component
 
         $this->contact->save();
 
+        // Log activity
+        Log::create([
+            'user_id' => auth()->id(),
+            'activity_description' => 'Updated contact: ' . $this->contact->name,
+            'old_values' => json_encode($oldValues),
+            'new_values' => json_encode($this->contact->fresh()->toArray()),
+        ]);
+
         $this->editingField = null;
         $this->isEditingAvatar = false;
         $this->reset(['image']);
@@ -116,12 +127,18 @@ class ViewContact extends Component
     public function deleteContact()
     {
         if ($this->contact) {
+            // Log activity before deleting
+            Log::create([
+                'user_id' => auth()->id(),
+                'activity_description' => 'Deleted contact: ' . $this->contact->name,
+                'old_values' => json_encode($this->contact->toArray()),
+            ]);
+
             $this->contact->delete();
         }
-    
+
         $this->reset(['contact', 'editingField', 'editValue', 'editNumberValues', 'image', 'isEditingAvatar']);
-    
-        return redirect()->to('/dashboard'); 
+
+        return redirect()->to('/dashboard');
     }
-    
 }
