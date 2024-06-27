@@ -32,5 +32,5 @@ Ensure you have the following installed:
 ## Getting Started
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone [<repository-url>](https://github.com/ruisu-iwnl/contact-list)
    cd contact-list
