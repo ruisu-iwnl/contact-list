@@ -37,7 +37,12 @@
                 </tr>
             @endforeach
         </tbody>
-    </table><br><br>
+    </table>
+
+    {{-- Pagination Links --}}
+    <div class="mt-4">
+        {{ $contacts->links() }}
+    </div>
     
     {{-- Logout Button --}}
     <form method="POST" action="{{ route('logout') }}">
@@ -70,7 +75,6 @@
             </div>
             <div class="flex justify-end mt-4">
                 <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onclick="toggleModal('view-modal-id-{{ $loop->index }}'); window.location.reload();">Close</button>
-
             </div>
         </div>
     </div>
