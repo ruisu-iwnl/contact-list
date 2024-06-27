@@ -3,6 +3,7 @@
 <div>            
     <header class="py-4 text-center">
         <h3 class="text-3xl font-bold">Activity Logs</h1>
+        <p>refresh the page if it's not updating</p>
     </header>
     <table class="table-auto w-full bg-white shadow-md rounded mb-4">
         <thead>
