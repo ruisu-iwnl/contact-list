@@ -27,7 +27,7 @@ jobs:
           - 6379:6379
 
       laravel:
-        image: sail-8.2/app  # Update to PHP 8.2
+        image: sail-8.2/app  # Update to PHP 8.2 or the appropriate version
         env:
           WWWUSER: root  # Ensure the correct WWWUSER is set
           LARAVEL_SAIL: 1
@@ -60,3 +60,11 @@ jobs:
 
       - name: Stop containers
         run: docker-compose down
+
+networks:
+  sail:
+    driver: bridge
+
+volumes:
+  sail-mysql:
+    driver: local
