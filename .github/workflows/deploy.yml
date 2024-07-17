@@ -28,6 +28,12 @@ jobs:
         run: |
           curl -s https://laravel.build/sail | bash
           ./vendor/bin/sail up -d
+          ./vendor/bin/sail artisan storage:link  # Ensure storage link is created
+
+      - name: Fix permissions
+        run: |
+          ./vendor/bin/sail exec --user=root laravel.test chown -R www-data:www-data /var/www/html
+          ./vendor/bin/sail exec --user=root laravel.test chmod -R 775 /var/www/html/storage
 
       - name: Run tests (if applicable)
         run: |
