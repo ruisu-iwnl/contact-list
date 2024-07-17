@@ -14,12 +14,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql/mysql-server:8.0  # Adjusted to match your Docker Compose setup
+        image: mysql/mysql-server:8.0
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: contactlistdb
         ports:
-          - 3307:3306  # Use a different external port (e.g., 3307) for MySQL
+          - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
