@@ -23,7 +23,9 @@ jobs:
 
     - name: Ensure public/storage directory exists
       run: |
-        mkdir -p public/storage
+        if [ ! -d "public/storage" ]; then
+          mkdir -p public/storage
+        fi
 
     - name: Build Jekyll site
       run: bundle exec jekyll build --trace
