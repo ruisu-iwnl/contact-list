@@ -1,4 +1,4 @@
-name: Jekyll Site CI
+name: Laravel Sail CI/CD
 
 on:
   push:
@@ -9,25 +9,34 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-    - name: Build Jekyll site
-      run: bundle exec jekyll build --trace
-      env:
-        JEKYLL_ENV: production
+    - name: Build and push Docker image
+      run: |
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker buildx build --platform linux/amd64 -t your-docker-username/repository-name:latest .
+        docker push your-docker-username/repository-name:latest
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./_site
+    - name: Set up Laravel Sail
+      run: |
+        alias sail='bash vendor/bin/sail'
+        sail composer install --no-ansi --no-interaction --no-progress --optimize-autoloader
+        sail artisan key:generate
+        sail artisan config:cache
+
+    - name: Run database migrations
+      run: sail artisan migrate --force
+
+    - name: Deploy to production
+      run: |
+        sail artisan optimize
+        sail artisan route:cache
+        sail artisan view:cache
