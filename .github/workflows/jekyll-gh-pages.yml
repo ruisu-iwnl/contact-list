@@ -13,6 +13,31 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      laravel.test:
+        image: sail-8.2/app  # Specify PHP 8.2 image for Sail
+        build:
+          context: ./vendor/laravel/sail/runtimes/8.3
+          dockerfile: Dockerfile
+          args:
+            WWWGROUP: '1000'
+        ports:
+          - '8080:80'
+          - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+        environment:
+          WWWUSER: '${{ secrets.WWWUSER }}'
+          LARAVEL_SAIL: 1
+          XDEBUG_MODE: '${{ secrets.SAIL_XDEBUG_MODE }}'
+          XDEBUG_CONFIG: '${{ secrets.SAIL_XDEBUG_CONFIG }}'
+          IGNITION_LOCAL_SITES_PATH: '${{ github.workspace }}'
+        volumes:
+          - '${{ github.workspace }}:/var/www/html'
+          - '${{ github.workspace }}/storage:/var/www/html/storage'
+        networks:
+          - sail
+        depends_on:
+          - mysql
+          - redis
+
       mysql:
         image: mysql/mysql-server:8.0
         env:
@@ -30,46 +55,46 @@ jobs:
           - 6379:6379
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Copy .env.example to .env
-      run: cp .env.example .env
+      - name: Copy .env.example to .env
+        run: cp .env.example .env
 
-    - name: Install Composer dependencies
-      run: |
-        curl -s https://getcomposer.org/installer | php
-        php composer.phar install --no-ansi --no-interaction --no-progress --optimize-autoloader
+      - name: Install Composer dependencies
+        run: |
+          curl -s https://getcomposer.org/installer | php
+          php composer.phar install --no-ansi --no-interaction --no-progress --optimize-autoloader
 
-    - name: Generate application key
-      run: php artisan key:generate
+      - name: Generate application key
+        run: php artisan key:generate
 
-    - name: Cache configuration
-      run: php artisan config:cache
+      - name: Cache configuration
+        run: php artisan config:cache
 
-    - name: Run database migrations
-      run: php artisan migrate --force
+      - name: Run database migrations
+        run: php artisan migrate --force
 
-    - name: Start Laravel Sail
-      run: ./vendor/bin/sail up -d
+      - name: Start Laravel Sail
+        run: ./vendor/bin/sail up -d
 
-    - name: Install NPM dependencies (if applicable)
-      run: ./vendor/bin/sail npm install --production
+      - name: Install NPM dependencies (if applicable)
+        run: ./vendor/bin/sail npm install --production
 
-    - name: Build assets (if applicable)
-      run: ./vendor/bin/sail npm run production
+      - name: Build assets (if applicable)
+        run: ./vendor/bin/sail npm run production
 
-    - name: Test your application (if applicable)
-      run: ./vendor/bin/sail test
+      - name: Test your application (if applicable)
+        run: ./vendor/bin/sail test
 
-    - name: Optimize Laravel application
-      run: php artisan optimize
+      - name: Optimize Laravel application
+        run: php artisan optimize
 
-    - name: Route caching
-      run: php artisan route:cache
+      - name: Route caching
+        run: php artisan route:cache
 
-    - name: View caching
-      run: php artisan view:cache
+      - name: View caching
+        run: php artisan view:cache
 
-    - name: Stop Laravel Sail
-      run: ./vendor/bin/sail down
+      - name: Stop Laravel Sail
+        run: ./vendor/bin/sail down
