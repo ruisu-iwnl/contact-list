@@ -1,16 +1,14 @@
-name: Deploy Laravel Sail Project
+name: Deploy
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     services:
       mysql:
@@ -18,15 +16,9 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: contactlistdb
-        ports:
-          - 3307:3306
+          MYSQL_USER: sail
+          MYSQL_PASSWORD: password
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      redis:
-        image: redis:alpine
-        ports:
-          - 6380:6379
-        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout code
@@ -36,48 +28,26 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, curl, zip, pdo, pdo_mysql, redis
 
-      - name: Set up Laravel Sail
-        run: composer require laravel/sail --dev
+      - name: Install Composer dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --no-suggest
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+      - name: Start MySQL service
+        run: docker-compose up -d mysql
 
-      - name: Copy .env.example to .env
-        run: cp .env.example .env
-
-      - name: Generate application key
-        run: php artisan key:generate
-
-      - name: Start Laravel Sail containers
+      - name: Wait for MySQL to be ready
         run: |
-          php artisan sail:install
-          ./vendor/bin/sail up -d
+          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3306; do sleep 30; done'
 
-      - name: Wait for MySQL to start
+      - name: Verify MySQL connection
+        run: php -r "if (!@mysqli_connect('127.0.0.1', 'root', 'password', 'contactlistdb', 3306)) { echo 'MySQL is not accessible'; exit(1); }"
+
+      - name: Deploy application
         run: |
-          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3307; do sleep 30; done'
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
 
-      - name: Test MySQL connection
-        run: php -r "if (!@mysqli_connect('127.0.0.1', 'root', 'password', 'contactlistdb', 3307)) { echo 'MySQL is not accessible'; exit(1); }"
-
-      - name: Wait for Redis to start
-        run: |
-          timeout 1m bash -c 'until echo > /dev/tcp/localhost/6380; do sleep 30; done'
-
-      - name: Update Laravel .env file with MySQL port
-        run: |
-          sed -i 's/DB_PORT=3306/DB_PORT=3307/g' .env
-
-      - name: Run database migrations
-        run: php artisan migrate --force
-
-      - name: Run tests (if applicable)
-        run: php artisan test
-
-      - name: Stop Laravel Sail containers
-        run: ./vendor/bin/sail down
-
-      - name: Deploy finished
-        run: echo "Deployment successful"
+      - name: Stop MySQL service
+        run: docker-compose down
