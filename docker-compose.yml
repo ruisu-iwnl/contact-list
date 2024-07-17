@@ -18,14 +18,13 @@ services:
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
-            - .:/var/www/html  
-            - ./storage:/var/www/html/storage
+            - '.:/var/www/html'
+            - './storage:/var/www/html/storage'
         networks:
             - sail
         depends_on:
             - mysql
-            - redis  
-
+            - redis
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -50,18 +49,15 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
-
-    redis:   
+    redis:
         image: 'redis:alpine'
         ports:
             - '6379:6379'
         networks:
             - sail
-
 networks:
     sail:
         driver: bridge
-
 volumes:
     sail-mysql:
         driver: local
