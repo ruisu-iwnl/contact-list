@@ -14,41 +14,56 @@ jobs:
 
     services:
       laravel.test:
-        image: sail-8.2/app  # Specify PHP 8.2 image for Sail
-        build:
-          context: ./vendor/laravel/sail/runtimes/8.2  # Adjust path to match your Sail version
-          dockerfile: Dockerfile
-          args:
-            WWWGROUP: '1000'
+        image: sail-8.3/app
         ports:
-          - '8080:80'
-        environment:
-          WWWUSER: '1000'
+          - 8080:80
+          - ${{ env.VITE_PORT:-5173 }}:${{ env.VITE_PORT:-5173 }}
+        env:
+          WWWUSER: ${{ secrets.WWWUSER }}
           LARAVEL_SAIL: 1
-          XDEBUG_MODE: 'off'  # Adjust as per your debugging needs
+          XDEBUG_MODE: ${{ env.SAIL_XDEBUG_MODE:-off }}
+          XDEBUG_CONFIG: ${{ env.SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal }}
+          IGNITION_LOCAL_SITES_PATH: ${{ github.workspace }}
         volumes:
-          - './:/var/www/html'
-          - './vendor:/var/www/html/vendor'
+          - ${{ github.workspace }}:/var/www/html
+          - ${{ github.workspace }}/storage:/var/www/html/storage
+        extra_hosts:
+          - host.docker.internal:host-gateway
         networks:
           - sail
-        options: --health-cmd="php-fpm --test" --health-interval=10s --health-timeout=5s --health-retries=3
+        depends_on:
+          - mysql
+          - redis
 
       mysql:
-        image: mysql:5.7
+        image: mysql/mysql-server:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: sail
-          MYSQL_USER: sail
-          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
         ports:
-          - '3306:3306'
+          - ${{ env.FORWARD_DB_PORT:-3306 }}:3306
+        volumes:
+          - sail-mysql:/var/lib/mysql
+          - ./vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh
         networks:
           - sail
+        healthcheck:
+          test:
+            - CMD
+            - mysqladmin
+            - ping
+            - '-p${{ secrets.DB_PASSWORD }}'
+          retries: 3
+          timeout: 5s
 
       redis:
         image: redis:alpine
         ports:
-          - '6379:6379'
+          - 6379:6379
         networks:
           - sail
 
@@ -65,13 +80,13 @@ jobs:
           php composer.phar install --no-ansi --no-interaction --no-progress --optimize-autoloader
 
       - name: Generate application key
-        run: php artisan key:generate
+        run: ./vendor/bin/sail artisan key:generate
 
       - name: Cache configuration
-        run: php artisan config:cache
+        run: ./vendor/bin/sail artisan config:cache
 
       - name: Run database migrations
-        run: php artisan migrate --force
+        run: ./vendor/bin/sail artisan migrate --force
 
       - name: Start Laravel Sail
         run: ./vendor/bin/sail up -d
@@ -86,13 +101,21 @@ jobs:
         run: ./vendor/bin/sail test
 
       - name: Optimize Laravel application
-        run: php artisan optimize
+        run: ./vendor/bin/sail artisan optimize
 
       - name: Route caching
-        run: php artisan route:cache
+        run: ./vendor/bin/sail artisan route:cache
 
       - name: View caching
-        run: php artisan view:cache
+        run: ./vendor/bin/sail artisan view:cache
 
       - name: Stop Laravel Sail
         run: ./vendor/bin/sail down
+
+networks:
+  sail:
+    driver: bridge
+
+volumes:
+  sail-mysql:
+    driver: local
