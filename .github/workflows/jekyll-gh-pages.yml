@@ -19,7 +19,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: contactlistdb
         ports:
-          - 3306:3306
+          - 3307:3306  # Use a different external port (e.g., 3307) for MySQL
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -50,7 +50,11 @@ jobs:
           ./vendor/bin/sail up -d
 
       - name: Wait for MySQL to start
-        run: dockerize -wait tcp://localhost:3306 -timeout 1m
+        run: dockerize -wait tcp://localhost:3307 -timeout 1m  # Update port to 3307 here
+
+      - name: Update Laravel .env file with MySQL port
+        run: |
+          sed -i 's/DB_PORT=3306/DB_PORT=3307/g' .env
 
       - name: Run database migrations
         run: php artisan migrate --force
