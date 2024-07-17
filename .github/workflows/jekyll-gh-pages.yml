@@ -19,6 +19,7 @@ jobs:
     - name: Set up Docker environment
       run: cp .env.example .env
 
+    # Ensure public/storage directory exists (if not needed, remove this step)
     - name: Ensure public/storage directory exists
       run: |
         if [ ! -d "public/storage" ]; then
