@@ -12,6 +12,23 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql/mysql-server:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -25,18 +42,29 @@ jobs:
         docker buildx build --platform linux/amd64 -t your-docker-username/repository-name:latest .
         docker push your-docker-username/repository-name:latest
 
-    - name: Set up Laravel Sail
+    - name: Set up Laravel Sail environment
       run: |
-        alias sail='bash vendor/bin/sail'
-        sail composer install --no-ansi --no-interaction --no-progress --optimize-autoloader
-        sail artisan key:generate
-        sail artisan config:cache
+        cp .env.example .env
+        echo "DB_HOST=mysql" >> .env
+        echo "REDIS_HOST=redis" >> .env
+
+    - name: Start Docker services
+      run: docker-compose up -d mysql redis
+
+    - name: Install Composer dependencies
+      run: docker-compose exec -T laravel.test composer install --no-ansi --no-interaction --no-progress --optimize-autoloader
+
+    - name: Generate application key
+      run: docker-compose exec -T laravel.test php artisan key:generate
+
+    - name: Cache configuration
+      run: docker-compose exec -T laravel.test php artisan config:cache
 
     - name: Run database migrations
-      run: sail artisan migrate --force
+      run: docker-compose exec -T laravel.test php artisan migrate --force
 
     - name: Deploy to production
       run: |
-        sail artisan optimize
-        sail artisan route:cache
-        sail artisan view:cache
+        docker-compose exec -T laravel.test php artisan optimize
+        docker-compose exec -T laravel.test php artisan route:cache
+        docker-compose exec -T laravel.test php artisan view:cache
