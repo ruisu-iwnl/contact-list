@@ -62,10 +62,16 @@ jobs:
         run: |
           sed -i 's/DB_PORT=3306/DB_PORT=3307/g' .env
 
+      - name: Debug: Show .env file
+        run: cat .env
+
       - name: Run database migrations
         run: php artisan migrate --force
 
       # Add more steps as needed, such as running tests
+
+      - name: Debug: Show Laravel logs
+        run: tail -n 100 storage/logs/laravel.log
 
       - name: Stop Laravel Sail containers
         run: ./vendor/bin/sail down
