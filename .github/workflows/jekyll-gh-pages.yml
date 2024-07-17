@@ -25,7 +25,7 @@ jobs:
       redis:
         image: redis:alpine
         ports:
-          - 6379:6379
+          - 6380:6379  # Use a different external port (e.g., 6380) for Redis
 
     steps:
       - name: Checkout code
