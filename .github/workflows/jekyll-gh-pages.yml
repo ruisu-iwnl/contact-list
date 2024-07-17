@@ -31,10 +31,11 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Build Jekyll site
         run: |
+          mkdir -p .jekyll-cache
           docker run --rm \
           -v $(pwd):/srv/jekyll \
           -v $(pwd)/vendor/bundle:/usr/local/bundle \
-          -e JEKYLL_CACHE_DIR=/srv/jekyll/_cache \
+          -v $(pwd)/.jekyll-cache:/srv/jekyll/.jekyll-cache \
           jekyll/jekyll:4 jekyll build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
