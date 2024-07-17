@@ -50,7 +50,8 @@ jobs:
           ./vendor/bin/sail up -d
 
       - name: Wait for MySQL to start
-        run: dockerize -wait tcp://localhost:3307 -timeout 1m  # Update port to 3307 here
+        run: |
+          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3307; do sleep 10; done'
 
       - name: Update Laravel .env file with MySQL port
         run: |
