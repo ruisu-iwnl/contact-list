@@ -30,25 +30,19 @@ jobs:
         with:
           php-version: '8.2'
 
+      - name: Copy .env.example to .env
+        run: cp .env.example .env
+
       - name: Install Composer dependencies
         run: composer install --no-dev --prefer-dist --no-progress --no-suggest
 
-      - name: Start MySQL service
-        run: docker-compose up -d mysql
-
-      - name: Wait for MySQL to be ready
+      - name: Start Laravel Sail containers
         run: |
-          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3306; do sleep 30; done'
+          vendor/bin/sail up -d
+          docker-compose exec -T laravel.test php artisan migrate --force
+          docker-compose exec -T laravel.test php artisan config:cache
+          docker-compose exec -T laravel.test php artisan route:cache
+          docker-compose exec -T laravel.test php artisan view:cache
 
-      - name: Verify MySQL connection
-        run: php -r "if (!@mysqli_connect('127.0.0.1', 'sail', 'password', 'contactlistdb', 3306)) { echo 'MySQL is not accessible'; exit(1); }"
-
-      - name: Deploy application
-        run: |
-          php artisan migrate --force
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-
-      - name: Stop MySQL service
-        run: docker-compose down
+      - name: Stop Laravel Sail containers
+        run: vendor/bin/sail down
