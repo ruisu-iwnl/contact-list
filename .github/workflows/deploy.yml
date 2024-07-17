@@ -21,6 +21,11 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -38,11 +43,15 @@ jobs:
 
       - name: Start Laravel Sail containers
         run: |
+          php artisan sail:install --with=mysql,redis
           vendor/bin/sail up -d
-          docker-compose exec -T laravel.test php artisan migrate --force
-          docker-compose exec -T laravel.test php artisan config:cache
-          docker-compose exec -T laravel.test php artisan route:cache
-          docker-compose exec -T laravel.test php artisan view:cache
+
+      - name: Run migrations and cache configurations
+        run: |
+          vendor/bin/sail artisan migrate --force
+          vendor/bin/sail artisan config:cache
+          vendor/bin/sail artisan route:cache
+          vendor/bin/sail artisan view:cache
 
       - name: Stop Laravel Sail containers
         run: vendor/bin/sail down
