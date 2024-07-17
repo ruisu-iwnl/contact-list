@@ -30,39 +30,77 @@ jobs:
       - name: Show running containers
         run: ./vendor/bin/sail ps  # Check if MySQL service is running
 
-      - name: Set up environment variables
-        env:
-          APP_NAME: Laravel
-          APP_ENV: local
-          APP_KEY: ${{ secrets.APP_KEY }}
-          APP_DEBUG: true
-          APP_TIMEZONE: UTC
-          APP_URL: http://localhost
-          DB_CONNECTION: mysql
-          DB_HOST: mysql
-          DB_PORT: 3306
-          DB_DATABASE: contactlistdb
-          DB_USERNAME: sail
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SESSION_DRIVER: redis
-          SESSION_LIFETIME: 120
-          SESSION_ENCRYPT: false
-          SESSION_PATH: /
-          SESSION_DOMAIN: null
-          MAIL_MAILER: smtp
-          MAIL_HOST: smtp.gmail.com
-          MAIL_PORT: 587
-          MAIL_USERNAME: e.luis.pelaez@gmail.com
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_ENCRYPTION: tls
-          MAIL_FROM_ADDRESS: e.luis.pelaez@gmail.com
-          MAIL_FROM_NAME: Laravel
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
-          AWS_USE_PATH_STYLE_ENDPOINT: false
-          VITE_APP_NAME: Laravel
+      - name: Generate .env File
+        run: |
+          echo "APP_NAME=Laravel" > .env
+          echo "APP_ENV=local" >> .env
+          echo "APP_KEY=${{ secrets.APP_KEY }}" >> .env
+          echo "APP_DEBUG=true" >> .env
+          echo "APP_TIMEZONE=UTC" >> .env
+          echo "APP_URL=http://localhost" >> .env
+          echo "" >> .env
+          echo "APP_LOCALE=en" >> .env
+          echo "APP_FALLBACK_LOCALE=en" >> .env
+          echo "APP_FAKER_LOCALE=en_US" >> .env
+          echo "" >> .env
+          echo "APP_MAINTENANCE_DRIVER=file" >> .env
+          echo "APP_MAINTENANCE_STORE=database" >> .env
+          echo "" >> .env
+          echo "BCRYPT_ROUNDS=12" >> .env
+          echo "" >> .env
+          echo "LOG_CHANNEL=stack" >> .env
+          echo "LOG_STACK=single" >> .env
+          echo "LOG_DEPRECATIONS_CHANNEL=null" >> .env
+          echo "LOG_LEVEL=debug" >> .env
+          echo "" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=mysql" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=contactlistdb" >> .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "" >> .env
+          echo "SESSION_DRIVER=redis" >> .env
+          echo "SESSION_LIFETIME=120" >> .env
+          echo "SESSION_ENCRYPT=false" >> .env
+          echo "SESSION_PATH=/" >> .env
+          echo "SESSION_DOMAIN=null" >> .env
+          echo "" >> .env
+          echo "BROADCAST_CONNECTION=log" >> .env
+          echo "FILESYSTEM_DISK=local" >> .env
+          echo "QUEUE_CONNECTION=redis" >> .env
+          echo "" >> .env
+          echo "CACHE_STORE=redis" >> .env
+          echo "REDIS_CACHE_CONNECTION=default" >> .env
+          echo "REDIS_CACHE_LOCK_CONNECTION=default" >> .env
+          echo "CACHE_PREFIX=" >> .env
+          echo "" >> .env
+          echo "MEMCACHED_HOST=127.0.0.1" >> .env
+          echo "" >> .env
+          echo "REDIS_CLIENT=phpredis" >> .env
+          echo "REDIS_HOST=redis" >> .env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
+          echo "REDIS_PORT=6379" >> .env
+          echo "" >> .env
+          echo "MAIL_MAILER=smtp" >> .env
+          echo "MAIL_HOST=smtp.gmail.com" >> .env
+          echo "MAIL_PORT=587" >> .env
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+          echo "MAIL_ENCRYPTION=tls" >> .env
+          echo "MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}" >> .env
+          echo "MAIL_FROM_NAME=${{ secrets.APP_NAME }}" >> .env
+          echo "" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+          echo "AWS_DEFAULT_REGION=us-east-1" >> .env
+          echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
+          echo "AWS_USE_PATH_STYLE_ENDPOINT=false" >> .env
+          echo "" >> .env
+          echo "VITE_APP_NAME=${{ secrets.APP_NAME }}" >> .env
+
+      - name: Load Environment Variables
+        run: cat .env
 
       - name: Run migrations (if needed)
         run: ./vendor/bin/sail artisan migrate --force  # Adjust as needed for your application
