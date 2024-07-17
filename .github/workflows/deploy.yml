@@ -59,6 +59,9 @@ jobs:
         run: |
           timeout 1m bash -c 'until echo > /dev/tcp/localhost/3307; do sleep 30; done'
 
+      - name: Test MySQL connection
+        run: php -r "if (!@mysqli_connect('127.0.0.1', 'root', 'password', 'contactlistdb', 3307)) { echo 'MySQL is not accessible'; exit(1); }"
+
       - name: Wait for Redis to start
         run: |
           timeout 1m bash -c 'until echo > /dev/tcp/localhost/6380; do sleep 30; done'
