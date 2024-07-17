@@ -22,11 +22,6 @@ jobs:
           - 3307:3306  # Use a different external port (e.g., 3307) for MySQL
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-      redis:
-        image: redis:alpine
-        ports:
-          - 6380:6379  # Use a different external port (e.g., 6380) for Redis
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -62,16 +57,11 @@ jobs:
         run: |
           sed -i 's/DB_PORT=3306/DB_PORT=3307/g' .env
 
-      - name: Debug: Show .env file
-        run: cat .env
-
       - name: Run database migrations
         run: php artisan migrate --force
 
-      # Add more steps as needed, such as running tests
-
-      - name: Debug: Show Laravel logs
-        run: tail -n 100 storage/logs/laravel.log
+      - name: Run tests (if applicable)
+        run: php artisan test
 
       - name: Stop Laravel Sail containers
         run: ./vendor/bin/sail down
