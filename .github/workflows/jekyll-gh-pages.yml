@@ -30,15 +30,10 @@ jobs:
     - name: Show running containers
       run: ./vendor/bin/sail ps  # Check if MySQL service is running
 
-    - name: Check MySQL logs
-      run: ./vendor/bin/sail mysql logs  # Example command to check MySQL logs
-
     - name: Start MySQL service if not running
       run: |
         ./vendor/bin/sail up -d mysql  # Start MySQL service if not running
-
-    - name: Wait for MySQL to start
-      run: sleep 15  # Adjust based on your application's startup time
+        sleep 15  # Adjust based on your application's startup time
 
     - name: Run migrations (if needed)
       run: ./vendor/bin/sail artisan migrate --force  # Adjust as needed for your application
