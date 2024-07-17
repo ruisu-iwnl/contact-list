@@ -30,11 +30,39 @@ jobs:
       - name: Show running containers
         run: ./vendor/bin/sail ps  # Check if MySQL service is running
 
-      - name: Generate .env File
-        run: cp .env.example .env  # Copy .env.example to .env
-
-      - name: Load Environment Variables
-        run: cat .env
+      - name: Set up environment variables
+        env:
+          APP_NAME: Laravel
+          APP_ENV: local
+          APP_KEY: ${{ secrets.APP_KEY }}
+          APP_DEBUG: true
+          APP_TIMEZONE: UTC
+          APP_URL: http://localhost
+          DB_CONNECTION: mysql
+          DB_HOST: mysql
+          DB_PORT: 3306
+          DB_DATABASE: contactlistdb
+          DB_USERNAME: sail
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SESSION_DRIVER: redis
+          SESSION_LIFETIME: 120
+          SESSION_ENCRYPT: false
+          SESSION_PATH: /
+          SESSION_DOMAIN: null
+          MAIL_MAILER: smtp
+          MAIL_HOST: smtp.gmail.com
+          MAIL_PORT: 587
+          MAIL_USERNAME: e.luis.pelaez@gmail.com
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_ENCRYPTION: tls
+          MAIL_FROM_ADDRESS: e.luis.pelaez@gmail.com
+          MAIL_FROM_NAME: Laravel
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_USE_PATH_STYLE_ENDPOINT: false
+          VITE_APP_NAME: Laravel
 
       - name: Run migrations (if needed)
         run: ./vendor/bin/sail artisan migrate --force  # Adjust as needed for your application
