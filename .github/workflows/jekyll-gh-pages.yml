@@ -16,17 +16,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Docker
-      uses: docker/setup-buildx-action@v1
-
-    - name: Build and start Laravel Sail containers
-      run: |
-        cp .env.example .env
-        ./vendor/bin/sail up -d
-        ./vendor/bin/sail artisan key:generate
-
-    - name: Install PHP dependencies
-      run: ./vendor/bin/sail composer install --optimize-autoloader --no-dev
+    - name: Set up Docker environment
+      run: cp .env.example .env
 
     - name: Ensure public/storage directory exists
       run: |
@@ -34,19 +25,32 @@ jobs:
           mkdir -p public/storage
         fi
 
+    - name: Start Laravel Sail
+      run: ./vendor/bin/sail up -d
+
+    - name: Install Composer dependencies
+      run: ./vendor/bin/sail composer install --optimize-autoloader
+
+    - name: Generate application key
+      run: ./vendor/bin/sail artisan key:generate
+
     - name: Run database migrations
       run: ./vendor/bin/sail artisan migrate --force
 
-    - name: Generate Laravel Mix assets
+    - name: Seed the database (if needed)
+      run: ./vendor/bin/sail artisan db:seed --force
+
+    - name: Build assets (if applicable)
       run: ./vendor/bin/sail npm install && ./vendor/bin/sail npm run production
 
-    - name: Build Jekyll site
-      run: ./vendor/bin/sail jekyll build --trace
-      env:
-        JEKYLL_ENV: production
+    - name: Run tests (if applicable)
+      run: ./vendor/bin/sail test
 
-    - name: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages (if applicable)
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./_site
+        publish_dir: ./public
+
+    - name: Stop Laravel Sail
+      run: ./vendor/bin/sail down
