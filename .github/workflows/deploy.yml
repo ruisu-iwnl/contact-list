@@ -28,19 +28,29 @@ jobs:
         run: |
           curl -s https://laravel.build/sail | bash
           ./vendor/bin/sail up -d
+          ./vendor/bin/sail artisan sail:install  # Install Laravel Sail if not already installed
+          ./vendor/bin/sail artisan migrate --force  # Run database migrations
           ./vendor/bin/sail artisan storage:link  # Ensure storage link is created
 
       - name: Fix permissions
         run: |
           ./vendor/bin/sail exec --user=root laravel.test chown -R www-data:www-data /var/www/html
           ./vendor/bin/sail exec --user=root laravel.test chmod -R 775 /var/www/html/storage
+          chmod -R 775 storage bootstrap/cache  # Additional permissions for Laravel
 
       - name: Run tests (if applicable)
         run: |
           ./vendor/bin/sail test
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public  # Adjust if your Laravel public directory is different
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          php artisan config:cache  # Clear and cache config
+          php artisan route:cache  # Cache routes
+          php artisan view:cache   # Cache views
+          php artisan event:cache  # Cache events
+          php artisan vendor:publish --tag=public --force  # Publish public assets
+          ./vendor/bin/sail artisan octane:start --port=8080
