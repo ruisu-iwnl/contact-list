@@ -26,6 +26,18 @@ jobs:
         ports:
           - 6379:6379
 
+      laravel:
+        image: sail-8.2/app  # Update to PHP 8.2
+        env:
+          WWWUSER: root  # Ensure the correct WWWUSER is set
+          LARAVEL_SAIL: 1
+          XDEBUG_MODE: off  # Adjust as needed
+          XDEBUG_CONFIG: client_host=host.docker.internal
+          IGNITION_LOCAL_SITES_PATH: ${{ github.workspace }}
+        ports:
+          - 8080:80
+          - ${VITE_PORT:-5173}:${VITE_PORT:-5173}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -36,17 +48,15 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --prefer-dist --no-progress
 
-      - name: Start MySQL and Redis containers
-        run: |
-          docker-compose up -d mysql redis
+      - name: Start containers
+        run: docker-compose up -d mysql redis laravel
 
       - name: Run migrations and cache configurations
         run: |
-          docker-compose exec -T mysql mysql -usail -ppassword -e "CREATE DATABASE IF NOT EXISTS contactlistdb;"
-          docker-compose exec -T mysql php artisan migrate --force
-          docker-compose exec -T mysql php artisan config:cache
-          docker-compose exec -T mysql php artisan route:cache
-          docker-compose exec -T mysql php artisan view:cache
+          docker-compose exec -T laravel php artisan migrate --force
+          docker-compose exec -T laravel php artisan config:cache
+          docker-compose exec -T laravel php artisan route:cache
+          docker-compose exec -T laravel php artisan view:cache
 
       - name: Stop containers
         run: docker-compose down
