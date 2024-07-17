@@ -25,15 +25,10 @@ jobs:
       run: ./vendor/bin/sail up -d
 
     - name: Wait for Laravel to start
-      run: sleep 10  # Adjust as needed based on your application's startup time
+      run: sleep 30  # Adjust as needed based on your application's startup time
 
     - name: Show running containers
       run: ./vendor/bin/sail ps  # Check if MySQL service is running
-
-    - name: Start MySQL service if not running
-      run: |
-        docker-compose -f vendor/laravel/sail/docker-compose.yml up -d mysql  # Ensure MySQL service is up
-        sleep 15  # Adjust based on your application's startup time
 
     - name: Load Environment Variables
       run: source .env
