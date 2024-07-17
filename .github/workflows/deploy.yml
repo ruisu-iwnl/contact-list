@@ -22,6 +22,12 @@ jobs:
           - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -51,7 +57,11 @@ jobs:
 
       - name: Wait for MySQL to start
         run: |
-          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3307; do sleep 10; done'
+          timeout 1m bash -c 'until echo > /dev/tcp/localhost/3307; do sleep 30; done'
+
+      - name: Wait for Redis to start
+        run: |
+          timeout 1m bash -c 'until echo > /dev/tcp/localhost/6379; do sleep 30; done'
 
       - name: Update Laravel .env file with MySQL port
         run: |
