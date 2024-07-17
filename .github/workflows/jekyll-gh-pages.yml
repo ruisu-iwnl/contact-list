@@ -10,38 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
 
-    - name: Install Composer dependencies
-      run: composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
 
-    - name: Run Laravel Sail
-      run: ./vendor/bin/sail up -d
+      - name: Run Laravel Sail
+        run: ./vendor/bin/sail up -d
 
-    - name: Wait for Laravel to start
-      run: sleep 30  # Adjust as needed based on your application's startup time
+      - name: Wait for Laravel to start
+        run: sleep 30  # Adjust as needed based on your application's startup time
 
-    - name: Show running containers
-      run: ./vendor/bin/sail ps  # Check if MySQL service is running
+      - name: Show running containers
+        run: ./vendor/bin/sail ps  # Check if MySQL service is running
 
-    - name: Generate .env File
-      run: cp .env.example .env  # Copy .env.example to .env
+      - name: Generate .env File
+        run: cp .env.example .env  # Copy .env.example to .env
 
-    - name: Load Environment Variables
-      run: cat .env
+      - name: Load Environment Variables
+        run: cat .env
 
-    - name: Run migrations (if needed)
-      run: ./vendor/bin/sail artisan migrate --force  # Adjust as needed for your application
+      - name: Run migrations (if needed)
+        run: ./vendor/bin/sail artisan migrate --force  # Adjust as needed for your application
 
-    - name: Run tests or other post-deployment tasks
-      run: |
-        ./vendor/bin/sail artisan test  # Example of running tests using sail artisan
+      - name: Run tests or other post-deployment tasks
+        run: |
+          ./vendor/bin/sail artisan test  # Example of running tests using sail artisan
 
-    - name: Stop Laravel Sail
-      run: ./vendor/bin/sail down
+      - name: Stop Laravel Sail
+        run: ./vendor/bin/sail down
