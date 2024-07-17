@@ -1,70 +1,40 @@
-name: Deploy Laravel Sail Project
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust as per your main branch name
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql/mysql-server:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: contactlistdb
-          MYSQL_USER: sail
-          MYSQL_PASSWORD: password
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      redis:
-        image: redis:alpine
-        ports:
-          - 6379:6379
-
-      laravel:
-        image: sail-8.2/app  # Update to PHP 8.2 or the appropriate version
-        env:
-          WWWUSER: root  # Ensure the correct WWWUSER is set
-          LARAVEL_SAIL: 1
-          XDEBUG_MODE: off  # Adjust as needed
-          XDEBUG_CONFIG: client_host=host.docker.internal
-          IGNITION_LOCAL_SITES_PATH: ${{ github.workspace }}
-        ports:
-          - 8080:80
-          - ${VITE_PORT:-5173}:${VITE_PORT:-5173}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy .env.example to .env
-        run: cp .env.example .env
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'  # Use the PHP version from your Dockerfile
 
       - name: Install Composer dependencies
-        run: composer install --no-dev --prefer-dist --no-progress
-
-      - name: Start containers
-        run: docker-compose up -d mysql redis laravel
-
-      - name: Run migrations and cache configurations
         run: |
-          docker-compose exec -T laravel php artisan migrate --force
-          docker-compose exec -T laravel php artisan config:cache
-          docker-compose exec -T laravel php artisan route:cache
-          docker-compose exec -T laravel php artisan view:cache
+          composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Stop containers
-        run: docker-compose down
+      - name: Build and run Docker containers with Laravel Sail
+        run: |
+          curl -s https://laravel.build/sail | bash
+          ./vendor/bin/sail up -d
 
-networks:
-  sail:
-    driver: bridge
+      - name: Run tests (if applicable)
+        run: |
+          ./vendor/bin/sail test
 
-volumes:
-  sail-mysql:
-    driver: local
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public  # Adjust if your Laravel public directory is different
