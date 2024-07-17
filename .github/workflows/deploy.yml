@@ -35,6 +35,9 @@ jobs:
         with:
           php-version: '8.2'
 
+      - name: Set WWWUSER in .env
+        run: echo "WWWUSER=root" >> .env
+
       - name: Copy .env.example to .env
         run: cp .env.example .env
 
