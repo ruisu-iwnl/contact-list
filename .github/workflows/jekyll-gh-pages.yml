@@ -21,6 +21,13 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --no-ansi --no-interaction --no-progress --no-scripts --optimize-autoloader
 
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ruisu-iwnl/contact-list:latest
+
     - name: Run Laravel Sail
       run: ./vendor/bin/sail up -d
 
