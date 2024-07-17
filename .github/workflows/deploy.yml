@@ -30,28 +30,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
       - name: Copy .env.example to .env
         run: cp .env.example .env
 
       - name: Install Composer dependencies
         run: composer install --no-dev --prefer-dist --no-progress --no-suggest
 
-      - name: Start Laravel Sail containers
+      - name: Start MySQL and Redis containers
         run: |
-          php artisan sail:install --with=mysql,redis
-          vendor/bin/sail up -d
+          docker-compose up -d mysql redis
 
       - name: Run migrations and cache configurations
         run: |
-          vendor/bin/sail artisan migrate --force
-          vendor/bin/sail artisan config:cache
-          vendor/bin/sail artisan route:cache
-          vendor/bin/sail artisan view:cache
+          docker-compose exec -T mysql mysql -usail -ppassword -e "CREATE DATABASE IF NOT EXISTS contactlistdb;"
+          docker-compose exec -T mysql php artisan migrate --force
+          docker-compose exec -T mysql php artisan config:cache
+          docker-compose exec -T mysql php artisan route:cache
+          docker-compose exec -T mysql php artisan view:cache
 
-      - name: Stop Laravel Sail containers
-        run: vendor/bin/sail down
+      - name: Stop containers
+        run: docker-compose down
