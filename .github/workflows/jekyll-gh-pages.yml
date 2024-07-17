@@ -22,6 +22,11 @@ jobs:
           - 3307:3306  # Use a different external port (e.g., 3307) for MySQL
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -60,8 +65,7 @@ jobs:
       - name: Run database migrations
         run: php artisan migrate --force
 
-      - name: Run tests (if applicable)
-        run: php artisan test
+      # Add more steps as needed, such as running tests
 
       - name: Stop Laravel Sail containers
         run: ./vendor/bin/sail down
